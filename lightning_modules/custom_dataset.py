@@ -7,8 +7,9 @@ from variables import constans
 from torch.utils.data import Dataset as BaseDataset
 from PIL import Image
 from matplotlib import pyplot as plt
+from torchvision import transforms
 
-class Dataset(BaseDataset):
+class PavingLawnDataset(BaseDataset):
     def __init__(self,image_dir,classes,augmentations=None,mask_augmentations=None):
         self.image_dir = image_dir
         self.image_names = natsort.natsorted([f for f in os.listdir(image_dir) if f.lower().endswith('.jpg')])
@@ -38,7 +39,7 @@ class Dataset(BaseDataset):
     
 
 if __name__ == "__main__":
-    ds=Dataset(constans.IMAGE_PATH,constans.CLASSES,None)
+    ds=PavingLawnDataset(constans.IMAGE_PATH,constans.CLASSES,None)
     
     for i in range(len(ds)):
         fig=plt.figure()
