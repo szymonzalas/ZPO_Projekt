@@ -2,3 +2,4 @@ neptune
 pytorch-lightning
 torchvision
 scikit-learn
+segmentation-models-pytorch
