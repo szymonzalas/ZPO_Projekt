@@ -176,5 +176,14 @@ cython_debug/
 # Others
 
 drony(2).ipynb
-data/
+data/test/*.jpg
+data/test/*.png
+data/test/*.csv
+data/train/*.jpg
+data/train/*.png
+data/train/*.csv
+data/images/*.jpg
+data/images/*.png
+data/images/*.csv
+
 lightning_logs/

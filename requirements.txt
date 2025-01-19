@@ -5,3 +5,4 @@ scikit-learn
 segmentation-models-pytorch
 matplotlib
 opencv-python
+natsort
