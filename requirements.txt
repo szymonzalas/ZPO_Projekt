@@ -3,3 +3,5 @@ pytorch-lightning
 torchvision
 scikit-learn
 segmentation-models-pytorch
+matplotlib
+opencv-python
