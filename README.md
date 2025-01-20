@@ -22,7 +22,7 @@ Tkinter package is required
 Other requirements are stored in requirements.txt
 
 ### Create neptune logger
-You can add neptune logging by enabling it in configuration file and creating .env file (in data/variables folder) with following keys:
+You can add neptune logging by enabling it in configuration file and creating .env file (in root project folder) with following keys:
 - neptune_project="project-path-from-neptune"
 - neptune_key="abcdefg..."
 

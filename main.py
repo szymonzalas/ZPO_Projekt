@@ -1,28 +1,41 @@
+
+# Append project root
 import os
 import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+# Standard library
+import random
+from dotenv import load_dotenv, dotenv_values 
+
+# Basic data manipulation and pyplot
 import cv2
-import torch
 import numpy as np
+from PIL import Image
+from tqdm import tqdm
 import matplotlib.pyplot as plt
+from collections import OrderedDict
+
+# Torch & Lightning
+import torch
 from torch.utils.data import DataLoader
 from torch.utils.data import Dataset as BaseDataset
+from torch.utils.data import random_split
 from torch.optim import lr_scheduler
+from torchvision import transforms
 import pytorch_lightning as pl
 import segmentation_models_pytorch as smp
-from dotenv import load_dotenv, dotenv_values 
-from torch.utils.data import random_split
-from torchvision import transforms
-from collections import OrderedDict
-from tqdm import tqdm
-import random
-from PIL import Image
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from lightning_modules.custom_dataset import PavingLawnDataset
+# From project folders
+#from utils import common
+from utils.custom_dataset import PavingLawnDataset
 from variables import constans
+from variables import params
 
+# Garbage collector
 import gc
 gc.collect()
+
 
 class LawnAndPaving(pl.LightningModule):
     def __init__(self, model, arch, out_classes, criterion, optimizer):
@@ -70,22 +83,19 @@ if __name__=="__main__":
     transform = transforms.Compose([
                 transforms.PILToTensor()
                 ])
-    dataset=PavingLawnDataset(constans.IMAGE_PATH,constans.CLASSES,transform,transform)
+    train_valid_dataset = PavingLawnDataset(constans.TRAIN_PATH, constans.CLASSES, transform,transform)
+    train_dataset,valid_dataset=random_split(train_valid_dataset, [160, 20])
+    test_dataset = PavingLawnDataset(constans.TEST_PATH, constans.CLASSES, transform,transform)
 
-    train_dataset, valid_dataset, test_dataset  = random_split(dataset, [0.7, 0.2, 0.1])
 
-    print("Total number of samples in the dataset:", len(dataset))
-    print("Number of samples in the training set:", len(train_dataset))
-    print("Number of samples in the validation set:", len(valid_dataset))
-    print("Number of samples in the test set:", len(test_dataset))
-
-    train_loader = DataLoader(train_dataset, batch_size=1, shuffle=True, num_workers=4)
-    valid_loader = DataLoader(valid_dataset, batch_size=1, shuffle=False, num_workers=4)
-    test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False, num_workers=4)
+    # Load dataloaders
+    train_loader = DataLoader(train_dataset, batch_size=constans.BATCH_SIZE, shuffle=True, num_workers=constans.NUM_WORKERS)
+    valid_loader = DataLoader(valid_dataset, batch_size=constans.BATCH_SIZE, shuffle=False, num_workers=constans.NUM_WORKERS)
+    test_loader = DataLoader(test_dataset, batch_size=constans.BATCH_SIZE, shuffle=False, num_workers=constans.NUM_WORKERS)
 
     arch = 'unet'
     enc_name = 'efficientnet-b0'
-    classes = 5
+    classes = 3
 
     model = smp.create_model(arch,
                             encoder_name=enc_name,
