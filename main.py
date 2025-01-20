@@ -27,7 +27,7 @@ import pytorch_lightning as pl
 import segmentation_models_pytorch as smp
 
 # From project folders
-#from utils import common
+from utils import common
 from utils.custom_dataset import PavingLawnDataset
 from variables import constans
 from variables import params
@@ -71,109 +71,85 @@ class LawnAndPaving(pl.LightningModule):
     
 
 if __name__=="__main__":
-    load_dotenv()
 
-    if not torch.cuda.is_available():
-        device=torch.device("cpu")
-        print("Current device:", device)
-    else:
-        device=torch.device("cuda")
-        print("Current device:", device, "- Type:", torch.cuda.get_device_name(0))
+    model = smp.create_model(arch=common.params['arch'],
+                            encoder_name=common.params['enc_name'],
+                            encoder_weights=common.params['enc_weights'],
+                            in_channels=common.params['in_channels'],
+                            classes=constans.NUM_CLASSES).to(common.device)
 
-    transform = transforms.Compose([
-                transforms.PILToTensor()
-                ])
-    train_valid_dataset = PavingLawnDataset(constans.TRAIN_PATH, constans.CLASSES, transform,transform)
-    train_dataset,valid_dataset=random_split(train_valid_dataset, [160, 20])
-    test_dataset = PavingLawnDataset(constans.TEST_PATH, constans.CLASSES, transform,transform)
+    optimizer = torch.optim.Adam(model.parameters(), lr=common.params['lr'])
+    criterion = smp.losses.DiceLoss(mode='multiclass', from_logits=True).to(common.device)
 
-
-    # Load dataloaders
-    train_loader = DataLoader(train_dataset, batch_size=constans.BATCH_SIZE, shuffle=True, num_workers=constans.NUM_WORKERS)
-    valid_loader = DataLoader(valid_dataset, batch_size=constans.BATCH_SIZE, shuffle=False, num_workers=constans.NUM_WORKERS)
-    test_loader = DataLoader(test_dataset, batch_size=constans.BATCH_SIZE, shuffle=False, num_workers=constans.NUM_WORKERS)
-
-    arch = 'unet'
-    enc_name = 'efficientnet-b0'
-    classes = 3
-
-    model = smp.create_model(arch,
-                            encoder_name=enc_name,
-                            encoder_weights="imagenet",
-                            in_channels=3,
-                            classes=classes).to(device)
-
-    optimizer = torch.optim.Adam(model.parameters(), lr=1e-03)
-    criterion = smp.losses.DiceLoss(mode='multiclass', from_logits=True).to(device)
-    cbs = pl.callbacks.ModelCheckpoint(dirpath=f'./checkpoints_{arch}',
-                                    filename=arch,
+    cbs = pl.callbacks.ModelCheckpoint(dirpath=f'./checkpoints_{common.params["arch"]}',
+                                    filename=common.params["arch"],
                                     verbose=True,
                                     monitor='valid_loss',
                                     mode='min')
 
-    pl_model = LawnAndPaving(model, arch, classes, criterion, optimizer)
-    trainer = pl.Trainer(callbacks=cbs, accelerator='gpu', max_epochs=2)
-    trainer.fit(pl_model, train_loader, valid_loader)
+    pl_model = LawnAndPaving(model, common.params['arch'], common.params['num_classes'], criterion, optimizer)
+    trainer = pl.Trainer(callbacks=cbs, accelerator='gpu', max_epochs=common.params['max_epoch'])
+    trainer.fit(pl_model, common.train_loader, common.valid_loader)
 
 
-    model = smp.create_model(arch,
-                            encoder_name = enc_name,
-                            encoder_weights = "imagenet",
-                            in_channels = 3,
-                            classes = classes).to(device)
+    # model = smp.create_model(arch,
+    #                         encoder_name = enc_name,
+    #                         encoder_weights = "imagenet",
+    #                         in_channels = 3,
+    #                         classes = classes).to(device)
 
-    state_dict = torch.load(cbs.best_model_path)['state_dict']
-    pl_state_dict = OrderedDict([(key[6:], state_dict[key]) for key in state_dict.keys()])
+    # state_dict = torch.load(cbs.best_model_path)['state_dict']
+    # pl_state_dict = OrderedDict([(key[6:], state_dict[key]) for key in state_dict.keys()])
 
-    model.load_state_dict(pl_state_dict)
-    model.eval()
-    with torch.no_grad(): 
+    # model.load_state_dict(pl_state_dict)
+    # model.eval()
+    # with torch.no_grad(): 
 
-        outputs = []
-        test_loss = 0.0
-        iou = 0
+    #     outputs = []
+    #     test_loss = 0.0
+    #     iou = 0
 
-        for image, mask in tqdm(test_loader):       
-            image=image.float()
-            image = image.to(device); mask = mask.to(device)
-            output = model(image).to(device)
-            tp, fp, fn, tn = smp.metrics.get_stats(torch.argmax(output, 1).unsqueeze(1), mask.long(), mode='multiclass', num_classes = 5)
-            outputs.append({"tp": tp, "fp": fp, "fn": fn, "tn": tn})
-            loss = criterion(output, mask.long()) 
-            test_loss += loss.item() 
+    #     for image, mask in tqdm(test_loader):       
+    #         image=image.float()
+    #         image = image.to(device); mask = mask.to(device)
+    #         output = model(image).to(device)
+    #         tp, fp, fn, tn = smp.metrics.get_stats(torch.argmax(output, 1).unsqueeze(1), mask.long(), mode='multiclass', num_classes = 5)
+    #         outputs.append({"tp": tp, "fp": fp, "fn": fn, "tn": tn})
+    #         loss = criterion(output, mask.long()) 
+    #         test_loss += loss.item() 
         
-        tp = torch.cat([x["tp"] for x in outputs])
-        fp = torch.cat([x["fp"] for x in outputs])
-        fn = torch.cat([x["fn"] for x in outputs])
-        tn = torch.cat([x["tn"] for x in outputs])
+    #     tp = torch.cat([x["tp"] for x in outputs])
+    #     fp = torch.cat([x["fp"] for x in outputs])
+    #     fn = torch.cat([x["fn"] for x in outputs])
+    #     tn = torch.cat([x["tn"] for x in outputs])
         
-        print(f'Test Loss: {test_loss / len(test_loader)}')
-        print('IoU:', smp.metrics.iou_score(tp, fp, fn, tn, reduction="micro-imagewise").item())
+    #     print(f'Test Loss: {test_loss / len(test_loader)}')
+    #     print('IoU:', smp.metrics.iou_score(tp, fp, fn, tn, reduction="micro-imagewise").item())
 
-        random.seed(10)
-        samples = random.sample(range(len(test_dataset)), 3)
+    #     random.seed(10)
+    #     samples = random.sample(range(len(test_dataset)), 3)
 
-        palette = [[155,38,182], [14,135,204], [124,252,0]]
-        pal = [value for color in palette for value in color]
+    #     palette = [[155,38,182], [14,135,204], [124,252,0]]
+    #     pal = [value for color in palette for value in color]
 
-        cols = ['Image', 'Mask', 'Prediction']
-        fig, axes = plt.subplots(len(samples), 3, figsize=(60, 40), sharex='row', sharey='row', 
-                                subplot_kw={'xticks':[], 'yticks':[]}, tight_layout=True)
+    #     cols = ['Image', 'Mask', 'Prediction']
+    #     fig, axes = plt.subplots(len(samples), 3, figsize=(60, 40), sharex='row', sharey='row', 
+    #                             subplot_kw={'xticks':[], 'yticks':[]}, tight_layout=True)
 
-        for ax, col in zip(axes[0], cols): ax.set_title(col, fontsize=20) # set column label --> considered epoch
+    #     for ax, col in zip(axes[0], cols): ax.set_title(col, fontsize=20) # set column label --> considered epoch
             
-        for i in range(len(samples)):
-            image, mask = test_dataset[samples[i]]
-            image = image.float()
-            pred = torch.argmax(model(torch.tensor(image).unsqueeze(0).to(device)), 1)
+    #     for i in range(len(samples)):
+    #         image, mask = test_dataset[samples[i]]
+    #         image = image.float()
+    #         pred = torch.argmax(model(torch.tensor(image).unsqueeze(0).to(device)), 1)
 
-            mask = Image.fromarray(mask.squeeze(0).cpu().numpy()).convert('P')
-            pred = Image.fromarray(np.array(pred.squeeze(0).cpu()).astype('uint8')).convert('P')
-            mask.putpalette(pal)
-            pred.putpalette(pal)
+    #         mask = Image.fromarray(mask.squeeze(0).cpu().numpy()).convert('P')
+    #         pred = Image.fromarray(np.array(pred.squeeze(0).cpu()).astype('uint8')).convert('P')
+    #         mask.putpalette(pal)
+    #         pred.putpalette(pal)
 
-            axes[i, 0].imshow(np.array(image).transpose(1, 2, 0))
-            axes[i, 1].imshow(mask)
-            axes[i, 2].imshow(pred)
+    #         axes[i, 0].imshow(np.array(image).transpose(1, 2, 0))
+    #         axes[i, 1].imshow(mask)
+    #         axes[i, 2].imshow(pred)
                 
-        fig.savefig(arch + '.png')
+    #     fig.savefig(arch + '.png')

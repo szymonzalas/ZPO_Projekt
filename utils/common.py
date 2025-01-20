@@ -68,14 +68,15 @@ transform_test  = transforms.Compose([
                   transforms.PILToTensor()
                   ])
 
+# RNG Generator
+generator = torch.Generator().manual_seed(params.SEED)
 
 # Load datasets
 #train_dataset = PavingLawnDataset(constans.TRAIN_PATH, constans.CLASSES, transform_train,transform_train)
 #valid_dataset = PavingLawnDataset(constans.VALID_PATH, constans.CLASSES, transform_valid,transform_valid)
 train_valid_dataset = PavingLawnDataset(constans.TRAIN_PATH, constans.CLASSES, transform_train,transform_train)
-train_dataset,valid_dataset=random_split(train_valid_dataset, [160, 20])
+train_dataset,valid_dataset=random_split(train_valid_dataset, [160, 20],generator=generator)
 test_dataset = PavingLawnDataset(constans.TEST_PATH, constans.CLASSES, transform_test,transform_test)
-
 
 # Load dataloaders
 train_loader = DataLoader(train_dataset, batch_size=constans.BATCH_SIZE, shuffle=True, num_workers=constans.NUM_WORKERS)
@@ -87,11 +88,17 @@ params={
     "num_classes" : constans.NUM_CLASSES,
     "batch_size" : constans.BATCH_SIZE,
     "num_workers" : constans.NUM_WORKERS,
+    "num_classes" : constans.NUM_CLASSES,
+    "in_channels": constans.IN_CHANNELS,
     "arch":params.ARCH,
     "enc_name" : params.ENC_NAME,
+    "enc_weights" : params.ENC_WEIGHTS,
     "max_epoch" : params.MAX_EPOCH,
-    "lr" : params.LR
+    "lr" : params.LR,
+    "seed":params.SEED
     }
+
+
 
 print("Common loaded")
 

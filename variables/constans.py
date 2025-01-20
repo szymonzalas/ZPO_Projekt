@@ -7,7 +7,7 @@ CLASSES = {0:'background',
            1:'lawn',
            2:'paving'}
 
-NUM_CLASSES = 3
+NUM_CLASSES = len(CLASSES)
 IN_CHANNELS = 3
 
 BATCH_SIZE = 4
