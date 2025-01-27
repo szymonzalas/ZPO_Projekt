@@ -187,5 +187,7 @@ data/images/*.png
 data/images/*.csv
 
 lightning_logs/
-
-checkpoints_unet/
+.neptune/
+unet.png
+data/
+checkpoints/
