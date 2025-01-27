@@ -75,7 +75,7 @@ generator = torch.Generator().manual_seed(params.SEED)
 #train_dataset = PavingLawnDataset(constans.TRAIN_PATH, constans.CLASSES, transform_train,transform_train)
 #valid_dataset = PavingLawnDataset(constans.VALID_PATH, constans.CLASSES, transform_valid,transform_valid)
 train_valid_dataset = PavingLawnDataset(constans.TRAIN_PATH, constans.CLASSES, transform_train,transform_train)
-train_dataset,valid_dataset=random_split(train_valid_dataset, [160, 20],generator=generator)
+train_dataset,valid_dataset=random_split(train_valid_dataset, [400, 50],generator=generator)
 test_dataset = PavingLawnDataset(constans.TEST_PATH, constans.CLASSES, transform_test,transform_test)
 
 # Load dataloaders

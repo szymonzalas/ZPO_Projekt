@@ -19,6 +19,8 @@ class PavingLawnDataset(BaseDataset):
         self.augmentations = augmentations
         self.mask_augmentations = mask_augmentations
         self.image_dir = image_dir
+        print(f"Found {len(self.image_names)} images in {self.image_dir}")
+        print(f"Found {len(self.mask_names)} masks in {self.image_dir}")
 
     def __len__(self):
         return len(self.image_names)

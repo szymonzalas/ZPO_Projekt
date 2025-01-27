@@ -18,6 +18,7 @@ from collections import OrderedDict
 
 # Torch & Lightning
 import torch
+import torchmetrics
 from torch.utils.data import DataLoader
 from torch.utils.data import Dataset as BaseDataset
 from torch.utils.data import random_split
@@ -25,6 +26,10 @@ from torch.optim import lr_scheduler
 from torchvision import transforms
 import pytorch_lightning as pl
 import segmentation_models_pytorch as smp
+
+# Neptune
+from pytorch_lightning.callbacks import EarlyStopping
+from pytorch_lightning.loggers import NeptuneLogger
 
 # From project folders
 from utils import common
@@ -45,6 +50,7 @@ class LawnAndPaving(pl.LightningModule):
         self.out_classes = out_classes
         self.criterion = criterion
         self.optimizer = optimizer
+        self.accuracy=torchmetrics.Accuracy(num_classes=out_classes,task='multiclass')
 
     def forward(self, x):
         return self.model(x)
@@ -56,21 +62,46 @@ class LawnAndPaving(pl.LightningModule):
         loss = self.criterion(out, mask.long())
         tp, fp, fn, tn = smp.metrics.get_stats(torch.argmax(out, 1).unsqueeze(1), mask.long(), mode='multiclass', num_classes=self.out_classes)
         iou = smp.metrics.iou_score(tp, fp, fn, tn, reduction="macro-imagewise")
-        self.log(f"{stage}_IoU", iou, prog_bar=True, on_epoch=True)
-        self.log(f"{stage}_loss", loss)
+        self.log('train_loss', loss, on_step=True, on_epoch=True, sync_dist=True)
+        self.log('train_acc', self.accuracy, prog_bar=True)
         return {"loss": loss, "iou": iou}
 
     def training_step(self, batch, batch_idx):
         return self.shared_step(batch, "train")
 
     def validation_step(self, batch, batch_idx):
-        return self.shared_step(batch, "valid")
+        result = self.shared_step(batch, "valid")
+        self.log('valid_loss', result["loss"], on_step=True, on_epoch=True, prog_bar=True, sync_dist=True)
+        return result
 
     def configure_optimizers(self):
         return self.optimizer
     
 
 if __name__=="__main__":
+
+    if common.neptune_log:
+        neptune_logger = NeptuneLogger(
+            project=common.neptune_project,
+            api_token=common.neptune_key,
+            tags=[params.ENC_NAME,params.ARCH,params.ENC_WEIGHTS,str(params.LR)],)
+        
+        early_stop_callback = EarlyStopping(
+        monitor='valid_loss',
+        min_delta=0.00,
+        patience=10,
+        verbose=True,
+        mode='min')
+
+        model_summary_callback = pl.callbacks.ModelSummary(max_depth=-1)
+        
+        cbs = pl.callbacks.ModelCheckpoint(
+        dirpath=f'./checkpoints_{common.params["arch"]}',
+        filename=common.params["arch"],
+        verbose=True,
+        monitor='valid_loss',
+        mode='min',
+        save_top_k=5)
 
     model = smp.create_model(arch=common.params['arch'],
                             encoder_name=common.params['enc_name'],
@@ -81,14 +112,17 @@ if __name__=="__main__":
     optimizer = torch.optim.Adam(model.parameters(), lr=common.params['lr'])
     criterion = smp.losses.DiceLoss(mode='multiclass', from_logits=True).to(common.device)
 
-    cbs = pl.callbacks.ModelCheckpoint(dirpath=f'./checkpoints_{common.params["arch"]}',
+    cbs = pl.callbacks.ModelCheckpoint(dirpath=f'./checkpoints/{common.params["arch"]}',
                                     filename=common.params["arch"],
                                     verbose=True,
                                     monitor='valid_loss',
                                     mode='min')
 
     pl_model = LawnAndPaving(model, common.params['arch'], common.params['num_classes'], criterion, optimizer)
-    trainer = pl.Trainer(callbacks=cbs, accelerator='gpu', max_epochs=common.params['max_epoch'])
+    if common.neptune_log:
+        trainer = pl.Trainer(logger=neptune_logger,callbacks=[early_stop_callback, cbs,model_summary_callback], accelerator='gpu', max_epochs=common.params['max_epoch'])
+    else:
+        trainer = pl.Trainer(callbacks=[cbs,model_summary_callback], accelerator='gpu', max_epochs=common.params['max_epoch'])
     trainer.fit(pl_model, common.train_loader, common.valid_loader)
 
 
