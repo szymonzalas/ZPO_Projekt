@@ -26,6 +26,7 @@ from torch.optim import lr_scheduler
 from torchvision import transforms
 import pytorch_lightning as pl
 import segmentation_models_pytorch as smp
+from lightning.pytorch.tuner import Tuner
 
 # Neptune
 from pytorch_lightning.callbacks import EarlyStopping
@@ -64,6 +65,7 @@ class LawnAndPaving(pl.LightningModule):
         iou = smp.metrics.iou_score(tp, fp, fn, tn, reduction="macro-imagewise")
         self.log('train_loss', loss, on_step=True, on_epoch=True, sync_dist=True)
         self.log('train_acc', self.accuracy, prog_bar=True)
+        self.log('train_iou', iou, prog_bar=True)
         return {"loss": loss, "iou": iou}
 
     def training_step(self, batch, batch_idx):
@@ -123,6 +125,8 @@ if __name__=="__main__":
         trainer = pl.Trainer(logger=neptune_logger,callbacks=[early_stop_callback, cbs,model_summary_callback], accelerator='gpu', max_epochs=common.params['max_epoch'])
     else:
         trainer = pl.Trainer(callbacks=[cbs,model_summary_callback], accelerator='gpu', max_epochs=common.params['max_epoch'])
+
+    tuner = tuner.Tuner()
     trainer.fit(pl_model, common.train_loader, common.valid_loader)
 
 
