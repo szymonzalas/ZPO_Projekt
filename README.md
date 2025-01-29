@@ -40,6 +40,7 @@ In order to run training:
 
 
 ## Results
+### Images
 Good predictions            |  Comment
 :-------------------------:|:-------------------------:
 ![](img/good2.png)  |  Correclty ignores crop fields, mostly correct segments pedestriants walkway without spilling into road, mostly correct segments lawns
@@ -62,12 +63,28 @@ Bad predictions            |  Comment
 ![](img/bad3.png))  | In the centre, very weird shapes, spilling to background
 ![](img/bad4.png)  |  While not the task for this segmentation, this example shows that model works badly in city centre where no images were taken and there are less (or even none) single family houses
 
+### Tracked data for selected models from [neptune.ai](neptune.ai)
+
+|hyperparams/model|hyperparams/enc|hyperparams/lr|train_iou (max)   |val_iou (max)     |test_iou (max)     |epoch|
+|-----------------|---------------|--------------|------------------|------------------|-------------------|-----|
+|unetplusplus     |efficientnet-b6|0.001         |0.9416207671165466|0.5701940059661865|0.5755499005317688 |47.0 |
+|unet             |efficientnet-b0|0.001         |0.9027917385101318|0.5618157386779785|0.575025200843811  |53.0 |
+|unet             |efficientnet-b6|0.001         |0.9413277506828308|0.5517038702964783|0.5732433199882507 |56.0 |
+|deeplabv3        |efficientnet-b3|0.001         |0.9576275944709778|0.5518802404403687|0.564145565032959  |74.0 |
+|deeplabv3plus    |efficientnet-b4|0.001         |0.9370303750038147|0.5376648306846619|0.5591127872467041 |42.0 |
+|deeplabv3        |mobileone_s0   |0.001         |0.8827603459358215|0.5226636528968811|0.5243299007415771 |38.0 |
+|unet             |timm-resnest14d|0.001         |0.8033912181854248|0.5084628462791443|0.5201904773712158 |50.0 |
+|unetplusplus     |timm-resnest14d|0.001         |0.8036372661590576|0.5073378086090088|0.5161973834037781 |54.0 |
+|unet             |mobileone_s0   |0.001         |0.8989769816398621|0.4465845823287964|0.42361971735954285|37.0 |
+
 
 
 ## Trained model in ONNX ready for `Deepness` plugin
 In order to export model to ONNX use `utils/onnx_export.py`. You need to modify `checkpoint_path` to ensure proper conversion. Exported model should have all metadata already in it and will appear in root folder of the project.
 While using model ensure that resolution remains at 10cm/px.
 Exported models are avilable in the root folder of project.
+
+Selected ONNX models can be downloaded from [link](https://drive.google.com/file/d/1OQCPB2GEueLkcQ2xIJ1Ji8A45A4fJt9w/view?usp=sharing).
 
 ## Demo instructions and video
 - Select map in _QGIS_ and activate _Deepness_ plugin
