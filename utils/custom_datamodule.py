@@ -24,7 +24,7 @@ class PavingLawnDatamodule(pl.LightningDataModule):
         self.batch_size=batch_size
         self.augmentations = A.Compose([
             A.Resize(width=512, height=512),
-            A.Normalize(timm.data.IMAGENET_DEFAULT_MEAN, timm.data.IMAGENET_DEFAULT_STD),
+            A.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
             ToTensorV2()])
 
     def prepare_data(self):
@@ -45,4 +45,4 @@ class PavingLawnDatamodule(pl.LightningDataModule):
         return DataLoader(self.val_dataset, batch_size=self.batch_size, num_workers=8)
     
     def test_dataloader(self):
-        return DataLoader(self.test_dataset, batch_size=32, num_workers=8)
+        return DataLoader(self.test_dataset, batch_size=self.batch_size, num_workers=8)

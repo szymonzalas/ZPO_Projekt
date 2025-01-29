@@ -16,7 +16,7 @@ import onnx
 import json
 
 
-checkpoint_path = 'checkpoint/unet_efficientnet-b0_imagenet.ckpt'
+checkpoint_path = 'checkpoint/deeplabv3_efficientnet-b3_imagenet.ckpt'
 model = LawnAndPaving.load_from_checkpoint(checkpoint_path)
 model.eval()
 model.to('cuda')
@@ -56,10 +56,10 @@ m3.value = json.dumps(50)
 # optional, if you want to standarize input after normalisation
 m4 = modelo.metadata_props.add()
 m4.key = 'standardization_mean'
-m4.value = json.dumps([0.0, 0.0, 0.0])
+m4.value = json.dumps([0.485, 0.456, 0.406])
 
 m5 = modelo.metadata_props.add()
 m5.key = 'standardization_std'
-m5.value = json.dumps([1.0, 1.0, 1.0])
+m5.value = json.dumps([0.229, 0.224, 0.225])
 
 onnx.save(modelo, export_model_name)

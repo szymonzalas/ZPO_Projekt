@@ -36,6 +36,7 @@ class LawnAndPaving(pl.LightningModule):
         self.accuracy = torchmetrics.Accuracy(task='multiclass', num_classes=constans.NUM_CLASSES)
         self.loss_fn=smp.losses.DiceLoss(mode='multiclass', from_logits=True).to(common.device)
         self.save_hyperparameters()
+        self.batch_size=params.BATCH_SIZE
         self.model = smp.create_model(arch=params.ARCH,
                             encoder_name=params.ENC_NAME,
                             encoder_weights=params.ENC_WEIGHTS,
@@ -57,7 +58,7 @@ class LawnAndPaving(pl.LightningModule):
 
         if torch.isinf(loss):
             return None
-        self.accuracy.update(outputs, labels.squeeze())
+        self.accuracy.update(outputs, labels.squeeze(1))
 
         tp, fp, fn, tn = smp.metrics.get_stats(torch.argmax(outputs, 1).unsqueeze(1), labels.long(), mode='multiclass', num_classes = constans.NUM_CLASSES)
 
