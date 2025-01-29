@@ -1,6 +1,6 @@
-ARCH = "unet" # ['unet', 'unetplusplus', 'manet', 'linknet', 'fpn', 'pspnet', 'deeplabv3', 'deeplabv3plus', 'pan', 'upernet', 'segformer']
-ENC_NAME = "efficientnet-b0"
-ENC_WEIGHTS = "imagenet"
+ARCH = "deeplabv3" # ['unet', 'unetplusplus', 'manet', 'linknet', 'fpn', 'pspnet', 'deeplabv3', 'deeplabv3plus', 'pan', 'upernet', 'segformer']
+ENC_NAME = "resnext101_32x16d"
+ENC_WEIGHTS = "instagram"
 LR = 1e-03
 SEED=42
 BATCH_SIZE=8
