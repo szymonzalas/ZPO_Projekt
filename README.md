@@ -12,8 +12,8 @@ Other requirements are stored in requirements.txt
 
 ### Create neptune logger
 Add neptune logging by  creating .env file (in root project folder) with following keys:
-- neptune_project="project-path-from-neptune"
-- neptune_key="abcdefg..."
+- `neptune_project="project-path-from-neptune"`
+- `neptune_key="abcdefg..."`
 
 ## Dataset
 ### Overview
@@ -31,28 +31,55 @@ Dataset was exported with train/test split of 0.9/0.1 (later in code train set i
 Training was done on multiple different networks avilable via [SMP](https://github.com/qubvel-org/segmentation_models.pytorch) like: unet, unetplusplus, fpn, deeplabv3, deeplabv3plus, pan... They were paired with encoders like (also from [SMP](https://smp.readthedocs.io/en/latest/encoders.html)): resnet, efficientnet, mobileone... We mostly skipped augmentation methods, refraining to enforcing appropiate sizes and normalizing images.
 
 In order to run training:
-- ensure date is stored in data/train and data/test folders (with validation set receiving 20% of train data)
+- ensure date is stored in `data/train` and `data/test` folders (with validation set receiving 20% of train data)
 - set up .env file as described above
-- create virtual env with requirements.txt file and activate
-- verify contents of variables/constans.py - those **should not** be modified between runs
-- set up parameters in variables/params.py - those **should** be modified between runs to change parameters of training
-- run utils/train.py from root folder of project
+- create virtual env with `requirements.txt` file and activate
+- verify contents of `variables/constans.py` - those **should not** be modified between runs
+- set up parameters in `variables/params.py` - those **should** be modified between runs to change parameters of training
+- run `utils/train.py` from root folder of project
 
 
-TODO
 ## Results
-- Example images from dataset (diverse), at least 4 images
-- Examples of good and bad predictions, at least 4 images
-- Metrics on the test and train dataset
+Good predictions            |  Comment
+:-------------------------:|:-------------------------:
+![](img/good2.png)  |  Correclty ignores crop fields, mostly correct segments pedestriants walkway without spilling into road, mostly correct segments lawns
+![](img/good3.png))  |  Very good lawn detection, somewhat good paving detection
+![](img/good4.png))  |  Mostly correct segmentation, small spill to field on the left and missing pedestriants pavement next to it
+![](img/good5.png)  |  Correct segmentation with exception of small gravel road being assigned as paving
+
+Mid predictions            |  Comment
+:-------------------------:|:-------------------------:
+![](img/mid1.png)  |  Missing some pavement while spilling to road, but skips driveways and correctly assigns lawn
+![](img/mid2.png))  |  Some pavement and lawn missing, but doesn't spill to road
+![](img/mid3.png))  |  Gravel road is assigned as a pavement
+![](img/mid4.png)  |  Spilling of pavement class to road, pavement has missing fragments, but skips fields of weed and trees (different masks colors on this example)
+
+
+Bad predictions            |  Comment
+:-------------------------:|:-------------------------:
+![](img/bad1.png)  |  Huge area of gravel parking is marked as pavement, while some of the pedestriants pavement is unmarked
+![](img/bad2.png))  |  Missing big areas of lawn, pavement with missing areas too
+![](img/bad3.png))  | In the centre, very weird shapes, spilling to background
+![](img/bad4.png)  |  While not the task for this segmentation, this example shows that model works badly in city centre where no images were taken and there are less (or even none) single family houses
+
+
 
 ## Trained model in ONNX ready for `Deepness` plugin
-In order to export model to ONNX use utils/onnx_export.py. You need to modify checkpoint_path to ensoure proper conversion. Exported model should have all metadata already in it and will appear in root folder of the project.
-- model uploaded to XXX and a LINK_HERE
+In order to export model to ONNX use `utils/onnx_export.py`. You need to modify `checkpoint_path` to ensure proper conversion. Exported model should have all metadata already in it and will appear in root folder of the project.
+While using model ensure that resolution remains at 10cm/px.
+Exported models are avilable in the root folder of project.
 
 ## Demo instructions and video
-- a short video of running the model in Deepness (no need for audio), preferably converted to GIF
-- what ortophoto to load in QGIS and what physical place to zoom-in. E.g. Poznan 2022 zoomed-in at PUT campus
-- showing the results of running the model
+- Select map in _QGIS_ and activate _Deepness_ plugin
+- Zoom in on region of intrest
+- Select model in `onnx` format
+- Load default parameters
+- Ensure that resolution remains at 10cm/px
+- Hit run and wait for results
+
+
+![](img/tutorial.gif)
+
 
 ## People
-Adam Nawrocki & Szymon Zalas
+[Adam Nawrocki](https://github.com/AdamTheStudent) & [Szymon Zalas](https://github.com/szymonzalas)

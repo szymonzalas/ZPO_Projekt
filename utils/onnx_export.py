@@ -16,7 +16,7 @@ import onnx
 import json
 
 
-checkpoint_path = 'checkpoint/unet_efficientnet-b0_imagenet.ckpt'
+checkpoint_path = 'checkpoint/unetplusplus_efficientnet-b6_imagenet.ckpt'
 model = LawnAndPaving.load_from_checkpoint(checkpoint_path)
 model.eval()
 model.to('cuda')
