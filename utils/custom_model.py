@@ -13,9 +13,6 @@ from torch.utils.data import random_split
 import pytorch_lightning as pl
 import segmentation_models_pytorch as smp
 
-# Neptune
-from pytorch_lightning.callbacks import EarlyStopping
-from pytorch_lightning.loggers import NeptuneLogger
 
 from variables import constans
 from utils import common   

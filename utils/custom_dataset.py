@@ -3,11 +3,8 @@ import os
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from variables import constans
 from torch.utils.data import Dataset as BaseDataset
 from PIL import Image
-from matplotlib import pyplot as plt
-from torchvision import transforms
 import numpy as np
 
 class PavingLawnDataset(BaseDataset):

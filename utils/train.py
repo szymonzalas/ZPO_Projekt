@@ -4,13 +4,9 @@ import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Torch & Lightning
-import torchmetrics
-import torch
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import ModelSummary
 from pytorch_lightning.callbacks import ModelCheckpoint
-
-import matplotlib.pyplot as plt
 
 
 # Neptune

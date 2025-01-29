@@ -4,12 +4,10 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import lightning.pytorch as lp
 import pytorch_lightning as pl
-from pathlib import Path
 from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader
 import albumentations as A
 from albumentations.pytorch.transforms import ToTensorV2
-import timm.data
 
 from utils.custom_dataset import PavingLawnDataset
 

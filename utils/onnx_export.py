@@ -1,16 +1,10 @@
-import natsort
 import os
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from variables import constans
-from utils import common
 from utils.custom_model import LawnAndPaving
-from utils.custom_dataset import PavingLawnDataset
-from variables import constans
 from variables import params
 
-import segmentation_models_pytorch as smp
 import torch
 import onnx
 import json

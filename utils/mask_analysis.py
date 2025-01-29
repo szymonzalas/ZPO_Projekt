@@ -1,6 +1,5 @@
 import os
 import random
-import numpy as np
 from torchvision.io import read_image
 import matplotlib
 from matplotlib import pyplot as plt
