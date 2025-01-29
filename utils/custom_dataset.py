@@ -28,7 +28,6 @@ class PavingLawnDataset(BaseDataset):
         image_path = os.path.join(self.image_dir, self.image_names[idx])
         mask_path = os.path.join(self.image_dir, self.mask_names[idx])
         image = np.asarray(Image.open(image_path).convert('RGB'))
-        print(image)
         mask = np.asarray(Image.open(mask_path))
         transformed = self.augmentations(image=image, mask=mask)
         return transformed['image'], transformed['mask']

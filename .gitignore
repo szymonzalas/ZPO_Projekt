@@ -190,4 +190,5 @@ lightning_logs/
 .neptune/
 unet.png
 data/
-checkpoints/
+checkpoint/
+*.ckpt
