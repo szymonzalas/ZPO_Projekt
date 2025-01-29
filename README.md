@@ -25,6 +25,8 @@ Dataset was exported with train/test split of 0.9/0.1 (later in code train set i
 0) background (houses, trees, roads, other data that doesn't fit remaining categories)
 1) lawn (any green-ish area that is next to a house)
 2) paving (any pavement designed for pedestriants and small vehicles like bikes)
+### Download
+A download is possible using [link](https://drive.google.com/file/d/1uWxtacHCtEi_7q6kJ38pOd25-AFzanHp/view?usp=sharing).
 
 
 ## Training

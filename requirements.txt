@@ -7,3 +7,5 @@ matplotlib
 opencv-python
 natsort
 python-dotenv
+lightning
+albumentations
