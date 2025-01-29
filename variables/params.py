@@ -3,5 +3,6 @@ ENC_NAME = "efficientnet-b0"
 ENC_WEIGHTS = "imagenet"
 LR = 1e-03
 SEED=42
+BATCH_SIZE=8
 
 MAX_EPOCH=1000

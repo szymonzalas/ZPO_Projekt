@@ -9,6 +9,3 @@ CLASSES = {0:'background',
 
 NUM_CLASSES = len(CLASSES)
 IN_CHANNELS = 3
-
-BATCH_SIZE = 4
-NUM_WORKERS=4
