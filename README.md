@@ -46,23 +46,23 @@ In order to run training:
 Good predictions            |  Comment
 :-------------------------:|:-------------------------:
 ![](img/good2.png)  |  Correclty ignores crop fields, mostly correct segments pedestriants walkway without spilling into road, mostly correct segments lawns
-![](img/good3.png))  |  Very good lawn detection, somewhat good paving detection
-![](img/good4.png))  |  Mostly correct segmentation, small spill to field on the left and missing pedestriants pavement next to it
+![](img/good3.png)  |  Very good lawn detection, somewhat good paving detection
+![](img/good4.png)  |  Mostly correct segmentation, small spill to field on the left and missing pedestriants pavement next to it
 ![](img/good5.png)  |  Correct segmentation with exception of small gravel road being assigned as paving
 
 Mid predictions            |  Comment
 :-------------------------:|:-------------------------:
 ![](img/mid1.png)  |  Missing some pavement while spilling to road, but skips driveways and correctly assigns lawn
-![](img/mid2.png))  |  Some pavement and lawn missing, but doesn't spill to road
-![](img/mid3.png))  |  Gravel road is assigned as a pavement
+![](img/mid2.png)  |  Some pavement and lawn missing, but doesn't spill to road
+![](img/mid3.png)  |  Gravel road is assigned as a pavement
 ![](img/mid4.png)  |  Spilling of pavement class to road, pavement has missing fragments, but skips fields of weed and trees (different masks colors on this example)
 
 
 Bad predictions            |  Comment
 :-------------------------:|:-------------------------:
 ![](img/bad1.png)  |  Huge area of gravel parking is marked as pavement, while some of the pedestriants pavement is unmarked
-![](img/bad2.png))  |  Missing big areas of lawn, pavement with missing areas too
-![](img/bad3.png))  | In the centre, very weird shapes, spilling to background
+![](img/bad2.png)  |  Missing big areas of lawn, pavement with missing areas too
+![](img/bad3.png)  | In the centre, very weird shapes, spilling to background
 ![](img/bad4.png)  |  While not the task for this segmentation, this example shows that model works badly in city centre where no images were taken and there are less (or even none) single family houses
 
 ### Tracked data for selected models from [neptune.ai](neptune.ai)
